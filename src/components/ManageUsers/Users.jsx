@@ -1,21 +1,30 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { fetchAllUser } from "../../services/userService";
+import ReactPaginate from "react-paginate";
 
 import "./Users.scss";
 
 const Users = (props) => {
   const [listUsers, setListUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentLimit, setCurrentLimit] = useState(3);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [currentPage]);
 
   const fetchUsers = async () => {
-    let response = await fetchAllUser();
+    let response = await fetchAllUser(currentPage, currentLimit);
     if (response && response.data && response.data.EC === 0) {
-      setListUsers(response.data.DT);
+      setTotalPages(response.data.DT.totalPages);
+      setListUsers(response.data.DT.users);
     }
+  };
+
+  const handlePageClick = async (event) => {
+    setCurrentPage(+event.selected + 1);
   };
 
   return (
@@ -41,6 +50,7 @@ const Users = (props) => {
                 <th scope="col">Email</th>
                 <th scope="col">Username</th>
                 <th scope="col">Groups</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
@@ -55,50 +65,78 @@ const Users = (props) => {
                         <td>{item.email}</td>
                         <td>{item.username}</td>
                         <td>{item.Group ? item.Group.name : ""}</td>
+                        <td>
+                          <button className="btn btn-warning">Edit</button>
+                          <button className="btn btn-danger">Delete</button>
+                        </td>
                       </tr>
                     );
                   })}
                 </>
               ) : (
                 <>
-                  <span>Not found users</span>
+                  <tr>
+                    <td>Not found users</td>
+                  </tr>
                 </>
               )}
             </tbody>
           </table>
         </div>
 
-        <div className="user-footer">
-          <nav aria-label="Page navigation example">
-            <ul className="pagination">
-              <li className="page-item">
-                <a href="#" className="page-link">
-                  Previous
-                </a>
-              </li>
-              <li className="page-item">
-                <a href="#" className="page-link">
-                  1
-                </a>
-              </li>
-              <li className="page-item">
-                <a href="#" className="page-link">
-                  2
-                </a>
-              </li>
-              <li className="page-item">
-                <a href="#" className="page-link">
-                  3
-                </a>
-              </li>
-              <li className="page-item">
-                <a href="#" className="page-link">
-                  Next
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
+        {totalPages > 0 && (
+          <div className="user-footer">
+            <ReactPaginate
+              nextLabel="next >"
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={3}
+              marginPagesDisplayed={4}
+              pageCount={totalPages}
+              previousLabel="< previous"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              breakLabel="..."
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              containerClassName="pagination"
+              activeClassName="active"
+              renderOnZeroPageCount={null}
+            />
+            {/* <nav aria-label="Page navigation example">
+              <ul className="pagination">
+                <li className="page-item">
+                  <a href="#" className="page-link">
+                    Previous
+                  </a>
+                </li>
+                <li className="page-item">
+                  <a href="#" className="page-link">
+                    1
+                  </a>
+                </li>
+                <li className="page-item">
+                  <a href="#" className="page-link">
+                    2
+                  </a>
+                </li>
+                <li className="page-item">
+                  <a href="#" className="page-link">
+                    3
+                  </a>
+                </li>
+                <li className="page-item">
+                  <a href="#" className="page-link">
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav> */}
+          </div>
+        )}
       </div>
     </div>
   );
