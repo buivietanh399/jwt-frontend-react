@@ -34,20 +34,21 @@ const Login = (props) => {
       return;
     }
 
-    let responseLogin = await loginUser(valueLogin, password);
-    responseLogin = responseLogin.data;
-    // console.log(responseLogin);
-    if (+responseLogin.EC === 0) {
+    let res = await loginUser(valueLogin, password);
+
+    // console.log(resLogin);
+    if (res && +res.EC === 0) {
       let data = {
         isAuthenticated: true,
         token: "fake token",
       };
       sessionStorage.setItem("account", JSON.stringify(data));
-      toast.success(responseLogin.EM);
+      toast.success(res.EM);
       history.push("/users");
       window.location.reload();
-    } else {
-      toast.error(responseLogin.EM);
+      if (res && +res.EC !== 0) {
+        toast.error(res.EM);
+      }
     }
   };
 
