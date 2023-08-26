@@ -16,6 +16,8 @@ const Users = (props) => {
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
   const [dataModal, setDataModal] = useState({});
 
+  const [isShowModalUser, setIsShowModalUser] = useState(false);
+
   useEffect(() => {
     fetchUsers();
   }, [currentPage]);
@@ -53,6 +55,10 @@ const Users = (props) => {
     }
   };
 
+  const onHideModalUser = () => {
+    setIsShowModalUser(false);
+  };
+
   return (
     <>
       <div className="container">
@@ -64,7 +70,14 @@ const Users = (props) => {
 
             <div className="actions">
               <button className="btn btn-success">Refresh</button>
-              <button className="btn btn-primary">Add new user</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setIsShowModalUser(true);
+                }}
+              >
+                Add new user
+              </button>
             </div>
           </div>
 
@@ -122,7 +135,7 @@ const Users = (props) => {
             <div className="user-footer">
               <ReactPaginate
                 nextLabel="next >"
-                onPageChange={handlePageClick}
+                onPageChange={(event) => handlePageClick(event)}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={4}
                 pageCount={totalPages}
@@ -152,7 +165,11 @@ const Users = (props) => {
         dataModal={dataModal}
       />
 
-      <ModalUser title={"Create new user"} />
+      <ModalUser
+        title={"Create new user"}
+        onHide={onHideModalUser}
+        show={isShowModalUser}
+      />
     </>
   );
 };
