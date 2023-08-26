@@ -13,10 +13,14 @@ const Users = (props) => {
   const [currentLimit, setCurrentLimit] = useState(3);
   const [totalPages, setTotalPages] = useState(0);
 
+  //Modal delete
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
   const [dataModal, setDataModal] = useState({});
 
+  // Modal update/create user
   const [isShowModalUser, setIsShowModalUser] = useState(false);
+  const [actionModalUser, setActionModalUser] = useState("CREATE");
+  const [dataModalUser, setDataModalUser] = useState({});
 
   useEffect(() => {
     fetchUsers();
@@ -55,8 +59,20 @@ const Users = (props) => {
     }
   };
 
-  const onHideModalUser = () => {
+  const onHideModalUser = async () => {
     setIsShowModalUser(false);
+    setDataModalUser({});
+    await fetchUsers();
+  };
+
+  const handleEditUser = (user) => {
+    setActionModalUser("UPDATE");
+    setDataModalUser(user);
+    setIsShowModalUser(true);
+  };
+
+  const handleRefresh = async () => {
+    await fetchUsers();
   };
 
   return (
@@ -64,18 +80,25 @@ const Users = (props) => {
       <div className="container">
         <div className="manage-users-container">
           <div className="user-header">
-            <div className="title">
-              <h3>Table Users</h3>
+            <div className="title mt-3">
+              <h3>Manage Users</h3>
             </div>
 
-            <div className="actions">
-              <button className="btn btn-success">Refresh</button>
+            <div className="actions my-3">
+              <button
+                className="btn btn-success refresh"
+                onClick={() => handleRefresh()}
+              >
+                <i className="fa fa-refresh"></i> Refresh
+              </button>
               <button
                 className="btn btn-primary"
                 onClick={() => {
                   setIsShowModalUser(true);
+                  setActionModalUser("CREATE");
                 }}
               >
+                <i className="fa fa-plus-circle"></i>
                 Add new user
               </button>
             </div>
@@ -100,21 +123,30 @@ const Users = (props) => {
                     {listUsers.map((item, index) => {
                       return (
                         <tr key={`row-${index}`}>
-                          <td>{index + 1}</td>
+                          <td>
+                            {(currentPage - 1) * currentLimit + index + 1}
+                          </td>
                           <td>{item.id}</td>
                           <td>{item.email}</td>
                           <td>{item.username}</td>
                           <td>{item.Group ? item.Group.name : ""}</td>
                           <td>
-                            <button className="btn btn-warning">Edit</button>
-                            <button
-                              className="btn btn-danger"
+                            <span
+                              title="Edit"
+                              className="edit"
+                              onClick={() => handleEditUser(item)}
+                            >
+                              <i className="fa fa-pencil"></i>
+                            </span>
+                            <span
+                              title="Delete"
+                              className="delete"
                               onClick={() => {
                                 handleDeleteUser(item);
                               }}
                             >
-                              Delete
-                            </button>
+                              <i className="fa fa-trash-o"></i>
+                            </span>
                           </td>
                         </tr>
                       );
@@ -169,6 +201,8 @@ const Users = (props) => {
         title={"Create new user"}
         onHide={onHideModalUser}
         show={isShowModalUser}
+        action={actionModalUser}
+        dataModalUser={dataModalUser}
       />
     </>
   );
