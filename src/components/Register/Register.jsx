@@ -88,11 +88,11 @@ const Register = (props) => {
     let check = isValidInputs();
     if (check) {
       let response = await registerNewUser(email, phone, username, password);
-      let responseData = response.data;
-      if (+responseData.EC === 0) {
-        toast.success(responseData.EM);
+
+      if (+response.EC === 0) {
+        toast.success(response.EM);
         history.push("/login");
-      } else toast.error(responseData.EM);
+      } else toast.error(response.EM);
     }
   };
 
