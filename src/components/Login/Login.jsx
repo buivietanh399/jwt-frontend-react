@@ -45,7 +45,8 @@ const Login = (props) => {
       sessionStorage.setItem("account", JSON.stringify(data));
       toast.success(res.EM);
       history.push("/users");
-      window.location.reload();
+      //window.location.reload();
+
       if (res && +res.EC !== 0) {
         toast.error(res.EM);
       }
